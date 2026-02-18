@@ -90,17 +90,19 @@
                 System='yes' />
         </Component>
 
-        <!-- Custom action: write config.toml on fresh install -->
+        <!-- Custom action: write config.toml on fresh install.
+             Runs as immediate (not deferred) so MSI properties like [API_KEY]
+             are resolved. Scheduled After='InstallFinalize' so files are
+             already on disk. Runs in the installing user's context so
+             $env:USERPROFILE points to the correct home directory. -->
         <CustomAction
             Id='WriteConfig'
             Directory='APPLICATIONFOLDER'
             ExeCommand='powershell.exe -NoProfile -ExecutionPolicy Bypass -File "[APPLICATIONFOLDER]write-config.ps1" -ApiKey "[API_KEY]" -Provider "[PROVIDER]" -ActivityArn "[ACTIVITY_ARN]"'
-            Execute='deferred'
-            Impersonate='yes'
             Return='ignore' />
 
         <InstallExecuteSequence>
-            <Custom Action='WriteConfig' After='InstallFiles' Condition='NOT Installed' />
+            <Custom Action='WriteConfig' After='InstallFinalize' Condition='NOT Installed' />
         </InstallExecuteSequence>
 
         <!-- Feature tree shown in the installer UI -->
