@@ -29,6 +29,7 @@ fmt:
 install:
     cargo install --path zeroclaw
     cargo install --path mcp-servers/browser-server
+    cargo install --path mcp-servers/config-server
 
 # ── Clean ────────────────────────────────────────────────────────
 
