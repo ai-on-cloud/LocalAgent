@@ -98,7 +98,7 @@
         <CustomAction
             Id='WriteConfig'
             Directory='APPLICATIONFOLDER'
-            ExeCommand='powershell.exe -NoProfile -ExecutionPolicy Bypass -File "[APPLICATIONFOLDER]write-config.ps1" -ApiKey "[API_KEY]" -Provider "[PROVIDER]" -ActivityArn "[ACTIVITY_ARN]"'
+            ExeCommand='powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\write-config.ps1" -ApiKey "[API_KEY]" -Provider "[PROVIDER]" -ActivityArn "[ACTIVITY_ARN]"'
             Return='ignore' />
 
         <InstallExecuteSequence>
