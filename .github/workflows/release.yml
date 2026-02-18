@@ -67,6 +67,14 @@ jobs:
                   cp mcp-servers/target/${{ matrix.target }}/release/browser-server${{ matrix.ext }} staging/
                   cp mcp-servers/target/${{ matrix.target }}/release/config-server${{ matrix.ext }} staging/
 
+            # Stage launcher and config scripts (Windows only)
+            - name: Stage scripts
+              if: runner.os == 'Windows'
+              shell: bash
+              run: |
+                  cp scripts/write-config.ps1 staging/
+                  cp scripts/start-localagent.bat staging/
+
             # Package (Unix)
             - name: Package (Unix)
               if: runner.os != 'Windows'

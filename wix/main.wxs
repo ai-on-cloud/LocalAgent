@@ -22,6 +22,11 @@
 
         <MediaTemplate EmbedCab='yes' />
 
+        <!-- Installer properties for API config dialog -->
+        <Property Id='API_KEY' Value='' Secure='yes' />
+        <Property Id='PROVIDER' Value='openrouter' />
+        <Property Id='ACTIVITY_ARN' Value='' />
+
         <StandardDirectory Id='ProgramFiles64Folder'>
             <Directory Id='APPLICATIONFOLDER' Name='LocalAgent'>
 
@@ -52,6 +57,24 @@
                         KeyPath='yes' />
                 </Component>
 
+                <!-- Launcher batch file -->
+                <Component Id='LauncherScript' Guid='*'>
+                    <File
+                        Id='start_localagent_bat'
+                        Name='start-localagent.bat'
+                        Source='$(var.BinDir)\start-localagent.bat'
+                        KeyPath='yes' />
+                </Component>
+
+                <!-- Config writer PowerShell script -->
+                <Component Id='WriteConfigScript' Guid='*'>
+                    <File
+                        Id='write_config_ps1'
+                        Name='write-config.ps1'
+                        Source='$(var.BinDir)\write-config.ps1'
+                        KeyPath='yes' />
+                </Component>
+
             </Directory>
         </StandardDirectory>
 
@@ -66,6 +89,21 @@
                 Action='set'
                 System='yes' />
         </Component>
+
+        <!-- Custom action: write config.toml on fresh install -->
+        <CustomAction
+            Id='WriteConfig'
+            Directory='APPLICATIONFOLDER'
+            ExeCommand='powershell.exe -NoProfile -ExecutionPolicy Bypass -File "[APPLICATIONFOLDER]write-config.ps1" -ApiKey "[API_KEY]" -Provider "[PROVIDER]" -ActivityArn "[ACTIVITY_ARN]"'
+            Execute='deferred'
+            Impersonate='yes'
+            Return='ignore' />
+
+        <InstallExecuteSequence>
+            <Custom Action='WriteConfig' After='InstallFiles'>
+                <![CDATA[NOT Installed]]>
+            </Custom>
+        </InstallExecuteSequence>
 
         <!-- Feature tree shown in the installer UI -->
         <Feature
@@ -117,6 +155,17 @@
 
             </Feature>
 
+            <!-- Launcher and scripts -->
+            <Feature
+                Id='LauncherFeature'
+                Title='Launcher &amp; Scripts'
+                Description='Batch launcher and configuration scripts for easy startup.'
+                Level='1'
+                AllowAbsent='yes'>
+                <ComponentRef Id='LauncherScript' />
+                <ComponentRef Id='WriteConfigScript' />
+            </Feature>
+
             <Feature
                 Id='PathEnvironment'
                 Title='PATH Environment Variable'
@@ -129,7 +178,41 @@
 
         <Property Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' />
 
+        <!-- Custom dialog for API configuration -->
         <ui:WixUI Id='WixUI_FeatureTree' />
+
+        <UI>
+            <!-- API Config dialog -->
+            <Dialog Id='ApiConfigDlg' Width='370' Height='270' Title='[ProductName] Setup'>
+                <Control Id='Title' Type='Text' X='15' Y='6' Width='200' Height='15' Transparent='yes' NoPrefix='yes' Text='{\WixUI_Font_Title}API Configuration' />
+                <Control Id='Description' Type='Text' X='25' Y='23' Width='280' Height='15' Transparent='yes' NoPrefix='yes' Text='Configure your AI provider and optional Activity channel.' />
+                <Control Id='BannerLine' Type='Line' X='0' Y='44' Width='370' Height='0' />
+
+                <Control Id='ApiKeyLabel' Type='Text' X='20' Y='60' Width='100' Height='13' NoPrefix='yes' Text='API Key:' />
+                <Control Id='ApiKeyEdit' Type='Edit' X='20' Y='75' Width='330' Height='18' Property='API_KEY' />
+
+                <Control Id='ProviderLabel' Type='Text' X='20' Y='105' Width='100' Height='13' NoPrefix='yes' Text='Provider (default: openrouter):' />
+                <Control Id='ProviderEdit' Type='Edit' X='20' Y='120' Width='330' Height='18' Property='PROVIDER' />
+
+                <Control Id='ActivityArnLabel' Type='Text' X='20' Y='150' Width='280' Height='13' NoPrefix='yes' Text='Activity ARN (optional, for AWS Step Functions):' />
+                <Control Id='ActivityArnEdit' Type='Edit' X='20' Y='165' Width='330' Height='18' Property='ACTIVITY_ARN' />
+
+                <Control Id='BottomLine' Type='Line' X='0' Y='234' Width='370' Height='0' />
+                <Control Id='Back' Type='PushButton' X='180' Y='243' Width='56' Height='17' Text='&amp;Back'>
+                    <Publish Event='NewDialog' Value='WelcomeDlg'>1</Publish>
+                </Control>
+                <Control Id='Next' Type='PushButton' X='236' Y='243' Width='56' Height='17' Default='yes' Text='&amp;Next'>
+                    <Publish Event='NewDialog' Value='CustomizeDlg'>1</Publish>
+                </Control>
+                <Control Id='Cancel' Type='PushButton' X='304' Y='243' Width='56' Height='17' Cancel='yes' Text='Cancel'>
+                    <Publish Event='SpawnDialog' Value='CancelDlg'>1</Publish>
+                </Control>
+            </Dialog>
+
+            <!-- Wire ApiConfigDlg into WixUI_FeatureTree navigation -->
+            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='ApiConfigDlg' Order='2'>1</Publish>
+            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='ApiConfigDlg' Order='2'>1</Publish>
+        </UI>
 
     </Package>
 
