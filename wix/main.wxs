@@ -90,15 +90,16 @@
                 System='yes' />
         </Component>
 
-        <!-- Custom action: write config.toml on fresh install.
+        <!-- Custom action: run zeroclaw onboard on fresh install.
+             Uses FileRef so MSI invokes the installed zeroclaw.exe directly.
              Runs as immediate (not deferred) so MSI properties like [API_KEY]
              are resolved. Scheduled After='InstallFinalize' so files are
-             already on disk. Runs in the installing user's context so
-             $env:USERPROFILE points to the correct home directory. -->
+             already on disk. Return='ignore' so a non-zero exit won't fail
+             the whole install. -->
         <CustomAction
             Id='WriteConfig'
-            Directory='APPLICATIONFOLDER'
-            ExeCommand='powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\write-config.ps1" -ApiKey "[API_KEY]" -Provider "[PROVIDER]" -ActivityArn "[ACTIVITY_ARN]"'
+            FileRef='zeroclaw_exe'
+            ExeCommand='onboard --api-key "[API_KEY]" --provider "[PROVIDER]" --activity-arn "[ACTIVITY_ARN]"'
             Return='ignore' />
 
         <InstallExecuteSequence>
