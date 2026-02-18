@@ -7,21 +7,38 @@ REM On exit, background processes are terminated.
 setlocal
 
 set "INSTALL_DIR=%~dp0"
+set "LOG_DIR=%TEMP%\localagent"
+if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 
 echo Starting LocalAgent...
 echo.
 
-REM Start config-server in background
+REM Start config-server in background (log to file for diagnostics)
 echo  [1/3] config-server (port 3100)
-start /B "" "%INSTALL_DIR%config-server.exe" --port 3100 > nul 2>&1
+start /B "" "%INSTALL_DIR%config-server.exe" --port 3100 > "%LOG_DIR%\config-server.log" 2>&1
 
 REM Start browser-server in background
 echo  [2/3] browser-server (port 3200)
-start /B "" "%INSTALL_DIR%browser-server.exe" --port 3200 > nul 2>&1
+start /B "" "%INSTALL_DIR%browser-server.exe" --port 3200 > "%LOG_DIR%\browser-server.log" 2>&1
 
 REM Wait for MCP servers to bind to their ports
 echo  Waiting for MCP servers to start...
 timeout /t 3 /nobreak > nul
+
+REM Check if servers are actually running
+tasklist /FI "IMAGENAME eq config-server.exe" 2>nul | find /I "config-server.exe" > nul
+if %ERRORLEVEL% equ 0 (
+    echo  config-server: running
+) else (
+    echo  config-server: FAILED to start (see %LOG_DIR%\config-server.log)
+)
+tasklist /FI "IMAGENAME eq browser-server.exe" 2>nul | find /I "browser-server.exe" > nul
+if %ERRORLEVEL% equ 0 (
+    echo  browser-server: running
+) else (
+    echo  browser-server: FAILED to start (see %LOG_DIR%\browser-server.log)
+)
+echo.
 
 REM Start zeroclaw daemon in foreground
 echo  [3/3] zeroclaw daemon
