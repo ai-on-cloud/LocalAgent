@@ -14,12 +14,14 @@ echo.
 REM Start config-server in background
 echo  [1/3] config-server (port 3100)
 start /B "" "%INSTALL_DIR%config-server.exe" --port 3100 > nul 2>&1
-set CONFIG_PID=%ERRORLEVEL%
 
 REM Start browser-server in background
 echo  [2/3] browser-server (port 3200)
 start /B "" "%INSTALL_DIR%browser-server.exe" --port 3200 > nul 2>&1
-set BROWSER_PID=%ERRORLEVEL%
+
+REM Wait for MCP servers to bind to their ports
+echo  Waiting for MCP servers to start...
+timeout /t 3 /nobreak > nul
 
 REM Start zeroclaw daemon in foreground
 echo  [3/3] zeroclaw daemon
