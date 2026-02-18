@@ -23,9 +23,9 @@
         <MediaTemplate EmbedCab='yes' />
 
         <!-- Installer properties for API config dialog -->
-        <Property Id='API_KEY' Value='' Secure='yes' />
+        <Property Id='API_KEY' Secure='yes' />
         <Property Id='PROVIDER' Value='openrouter' />
-        <Property Id='ACTIVITY_ARN' Value='' />
+        <Property Id='ACTIVITY_ARN' Secure='yes' />
 
         <StandardDirectory Id='ProgramFiles64Folder'>
             <Directory Id='APPLICATIONFOLDER' Name='LocalAgent'>
@@ -100,9 +100,7 @@
             Return='ignore' />
 
         <InstallExecuteSequence>
-            <Custom Action='WriteConfig' After='InstallFiles'>
-                <![CDATA[NOT Installed]]>
-            </Custom>
+            <Custom Action='WriteConfig' After='InstallFiles' Condition='NOT Installed' />
         </InstallExecuteSequence>
 
         <!-- Feature tree shown in the installer UI -->
@@ -176,8 +174,6 @@
             </Feature>
         </Feature>
 
-        <Property Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' />
-
         <!-- Custom dialog for API configuration -->
         <ui:WixUI Id='WixUI_FeatureTree' />
 
@@ -199,19 +195,19 @@
 
                 <Control Id='BottomLine' Type='Line' X='0' Y='234' Width='370' Height='0' />
                 <Control Id='Back' Type='PushButton' X='180' Y='243' Width='56' Height='17' Text='&amp;Back'>
-                    <Publish Event='NewDialog' Value='WelcomeDlg'>1</Publish>
+                    <Publish Event='NewDialog' Value='WelcomeDlg' Condition='1' />
                 </Control>
                 <Control Id='Next' Type='PushButton' X='236' Y='243' Width='56' Height='17' Default='yes' Text='&amp;Next'>
-                    <Publish Event='NewDialog' Value='CustomizeDlg'>1</Publish>
+                    <Publish Event='NewDialog' Value='CustomizeDlg' Condition='1' />
                 </Control>
                 <Control Id='Cancel' Type='PushButton' X='304' Y='243' Width='56' Height='17' Cancel='yes' Text='Cancel'>
-                    <Publish Event='SpawnDialog' Value='CancelDlg'>1</Publish>
+                    <Publish Event='SpawnDialog' Value='CancelDlg' Condition='1' />
                 </Control>
             </Dialog>
 
             <!-- Wire ApiConfigDlg into WixUI_FeatureTree navigation -->
-            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='ApiConfigDlg' Order='2'>1</Publish>
-            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='ApiConfigDlg' Order='2'>1</Publish>
+            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='ApiConfigDlg' Order='2' Condition='1' />
+            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='ApiConfigDlg' Order='2' Condition='1' />
         </UI>
 
     </Package>
