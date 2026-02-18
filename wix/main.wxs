@@ -1,88 +1,71 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!--
-  LocalAgent umbrella Windows installer.
+  LocalAgent umbrella Windows installer (WiX v4 format).
   Bundles zeroclaw (local agent) and all MCP servers into a single MSI.
 
-  Build: cargo-wix is not used directly for this template.
-  Instead, the release workflow calls `wix build` with the pre-built binaries.
+  Build: the release workflow calls `wix build` with the pre-built binaries.
 -->
-<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'
+     xmlns:ui='http://wixtoolset.org/schemas/v4/wxs/ui'>
 
-    <Product
-        Id='*'
+    <Package
         Name='LocalAgent'
         UpgradeCode='D7E1A2B3-4C5D-6E7F-8A9B-0C1D2E3F4A5B'
         Manufacturer='OpenClaw'
         Language='1033'
-        Codepage='65001'
-        Version='$(var.Version)'>
-
-        <Package Id='*'
-            Keywords='Installer'
-            Description='LocalAgent - Local-cloud agent system for enterprise task automation'
-            Manufacturer='OpenClaw'
-            InstallerVersion='450'
-            Languages='1033'
-            Compressed='yes'
-            InstallScope='perMachine'
-            SummaryCodepage='65001' />
+        Version='$(var.Version)'
+        Scope='perMachine'>
 
         <MajorUpgrade
             Schedule='afterInstallInitialize'
             DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.' />
 
-        <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
-        <Property Id='DiskPrompt' Value='LocalAgent Installation' />
+        <MediaTemplate EmbedCab='yes' />
 
-        <Directory Id='TARGETDIR' Name='SourceDir'>
-            <Directory Id='ProgramFiles64Folder' Name='PFiles'>
-                <Directory Id='APPLICATIONFOLDER' Name='LocalAgent'>
+        <StandardDirectory Id='ProgramFiles64Folder'>
+            <Directory Id='APPLICATIONFOLDER' Name='LocalAgent'>
 
-                    <!-- zeroclaw local agent -->
-                    <Component Id='ZeroclawBinary' Guid='*' Win64='yes'>
-                        <File
-                            Id='zeroclaw_exe'
-                            Name='zeroclaw.exe'
-                            DiskId='1'
-                            Source='$(var.BinDir)\zeroclaw.exe'
-                            KeyPath='yes' />
-                    </Component>
+                <!-- zeroclaw local agent -->
+                <Component Id='ZeroclawBinary' Guid='*'>
+                    <File
+                        Id='zeroclaw_exe'
+                        Name='zeroclaw.exe'
+                        Source='$(var.BinDir)\zeroclaw.exe'
+                        KeyPath='yes' />
+                </Component>
 
-                    <!-- browser-server MCP server -->
-                    <Component Id='BrowserServerBinary' Guid='*' Win64='yes'>
-                        <File
-                            Id='browser_server_exe'
-                            Name='browser-server.exe'
-                            DiskId='1'
-                            Source='$(var.BinDir)\browser-server.exe'
-                            KeyPath='yes' />
-                    </Component>
+                <!-- browser-server MCP server -->
+                <Component Id='BrowserServerBinary' Guid='*'>
+                    <File
+                        Id='browser_server_exe'
+                        Name='browser-server.exe'
+                        Source='$(var.BinDir)\browser-server.exe'
+                        KeyPath='yes' />
+                </Component>
 
-                    <!-- config-server MCP server -->
-                    <Component Id='ConfigServerBinary' Guid='*' Win64='yes'>
-                        <File
-                            Id='config_server_exe'
-                            Name='config-server.exe'
-                            DiskId='1'
-                            Source='$(var.BinDir)\config-server.exe'
-                            KeyPath='yes' />
-                    </Component>
+                <!-- config-server MCP server -->
+                <Component Id='ConfigServerBinary' Guid='*'>
+                    <File
+                        Id='config_server_exe'
+                        Name='config-server.exe'
+                        Source='$(var.BinDir)\config-server.exe'
+                        KeyPath='yes' />
+                </Component>
 
-                </Directory>
             </Directory>
+        </StandardDirectory>
 
-            <!-- Add install directory to system PATH -->
-            <Component Id='PathEntry' Guid='C1D2E3F4-A5B6-7C8D-9E0F-A1B2C3D4E5F6' Win64='yes' KeyPath='yes'>
-                <Environment
-                    Id='PATH'
-                    Name='PATH'
-                    Value='[APPLICATIONFOLDER]'
-                    Permanent='no'
-                    Part='last'
-                    Action='set'
-                    System='yes' />
-            </Component>
-        </Directory>
+        <!-- Add install directory to system PATH -->
+        <Component Id='PathEntry' Guid='C1D2E3F4-A5B6-7C8D-9E0F-A1B2C3D4E5F6' Directory='APPLICATIONFOLDER'>
+            <Environment
+                Id='PATH'
+                Name='PATH'
+                Value='[APPLICATIONFOLDER]'
+                Permanent='no'
+                Part='last'
+                Action='set'
+                System='yes' />
+        </Component>
 
         <!-- Feature tree shown in the installer UI -->
         <Feature
@@ -93,7 +76,7 @@
             ConfigurableDirectory='APPLICATIONFOLDER'
             AllowAdvertise='no'
             Display='expand'
-            Absent='disallow'>
+            AllowAbsent='no'>
 
             <!-- zeroclaw is always installed -->
             <Feature
@@ -101,7 +84,7 @@
                 Title='zeroclaw (Local Agent)'
                 Description='The zeroclaw local agent for enterprise task automation.'
                 Level='1'
-                Absent='disallow'>
+                AllowAbsent='no'>
                 <ComponentRef Id='ZeroclawBinary' />
             </Feature>
 
@@ -112,14 +95,14 @@
                 Description='MCP servers providing automation primitives.'
                 Level='1'
                 Display='expand'
-                Absent='allow'>
+                AllowAbsent='yes'>
 
                 <Feature
                     Id='BrowserMcp'
                     Title='Browser MCP Server'
                     Description='Headless browser automation via Chrome DevTools Protocol.'
                     Level='1'
-                    Absent='allow'>
+                    AllowAbsent='yes'>
                     <ComponentRef Id='BrowserServerBinary' />
                 </Feature>
 
@@ -128,20 +111,9 @@
                     Title='Config MCP Server'
                     Description='Manage zeroclaw configuration through MCP tools.'
                     Level='1'
-                    Absent='allow'>
+                    AllowAbsent='yes'>
                     <ComponentRef Id='ConfigServerBinary' />
                 </Feature>
-
-                <!-- Future: Windows MCP server
-                <Feature
-                    Id='WindowsMcp'
-                    Title='Windows MCP Server'
-                    Description='Native Windows UI automation via Win32/UIA.'
-                    Level='1'
-                    Absent='allow'>
-                    <ComponentRef Id='WindowsServerBinary' />
-                </Feature>
-                -->
 
             </Feature>
 
@@ -150,19 +122,15 @@
                 Title='PATH Environment Variable'
                 Description='Add LocalAgent to the system PATH so all tools can be run from any command prompt.'
                 Level='1'
-                Absent='allow'>
+                AllowAbsent='yes'>
                 <ComponentRef Id='PathEntry' />
             </Feature>
         </Feature>
 
-        <SetProperty Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' After='CostFinalize' />
+        <Property Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' />
 
-        <UI>
-            <UIRef Id='WixUI_FeatureTree' />
-            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='99'>1</Publish>
-            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='99'>1</Publish>
-        </UI>
+        <ui:WixUI Id='WixUI_FeatureTree' />
 
-    </Product>
+    </Package>
 
 </Wix>

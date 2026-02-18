@@ -88,6 +88,10 @@ jobs:
                   dotnet tool install --global wix --version 4.0.6
               continue-on-error: true
 
+            - name: Add WiX UI extension
+              if: runner.os == 'Windows'
+              run: wix extension add WixToolset.UI.wixext/4.0.6
+
             - name: Build MSI
               if: runner.os == 'Windows'
               shell: pwsh
@@ -96,6 +100,7 @@ jobs:
                   # Ensure version is valid x.y.z format for MSI
                   if ($version -notmatch '^\d+\.\d+\.\d+') { $version = "0.1.0" }
                   wix build wix/main.wxs `
+                    -ext WixToolset.UI.wixext `
                     -d Version=$version `
                     -d BinDir=staging `
                     -o local-agent-${{ matrix.target }}.msi
