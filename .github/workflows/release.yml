@@ -32,8 +32,11 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
-              with:
-                  submodules: recursive
+
+            - name: Checkout submodules
+              run: |
+                  git config --global url."https://github.com/".insteadOf "git@github.com:"
+                  git submodule update --init --recursive --depth=1
 
             - uses: dtolnay/rust-toolchain@stable
               with:
