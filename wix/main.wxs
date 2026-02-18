@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='windows-1252'?>
+<?xml version='1.0' encoding='utf-8'?>
 <!--
   LocalAgent umbrella Windows installer.
   Bundles zeroclaw (local agent) and all MCP servers into a single MSI.
@@ -14,7 +14,7 @@
         UpgradeCode='D7E1A2B3-4C5D-6E7F-8A9B-0C1D2E3F4A5B'
         Manufacturer='OpenClaw'
         Language='1033'
-        Codepage='1252'
+        Codepage='65001'
         Version='$(var.Version)'>
 
         <Package Id='*'
@@ -25,7 +25,7 @@
             Languages='1033'
             Compressed='yes'
             InstallScope='perMachine'
-            SummaryCodepage='1252' />
+            SummaryCodepage='65001' />
 
         <MajorUpgrade
             Schedule='afterInstallInitialize'
@@ -55,6 +55,16 @@
                             Name='browser-server.exe'
                             DiskId='1'
                             Source='$(var.BinDir)\browser-server.exe'
+                            KeyPath='yes' />
+                    </Component>
+
+                    <!-- config-server MCP server -->
+                    <Component Id='ConfigServerBinary' Guid='*' Win64='yes'>
+                        <File
+                            Id='config_server_exe'
+                            Name='config-server.exe'
+                            DiskId='1'
+                            Source='$(var.BinDir)\config-server.exe'
                             KeyPath='yes' />
                     </Component>
 
@@ -111,6 +121,15 @@
                     Level='1'
                     Absent='allow'>
                     <ComponentRef Id='BrowserServerBinary' />
+                </Feature>
+
+                <Feature
+                    Id='ConfigMcp'
+                    Title='Config MCP Server'
+                    Description='Manage zeroclaw configuration through MCP tools.'
+                    Level='1'
+                    Absent='allow'>
+                    <ComponentRef Id='ConfigServerBinary' />
                 </Feature>
 
                 <!-- Future: Windows MCP server
