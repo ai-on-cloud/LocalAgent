@@ -53,10 +53,10 @@ jobs:
               working-directory: zeroclaw
               run: cargo build --release --locked --target ${{ matrix.target }}
 
-            # Build browser-server
-            - name: Build browser-server
+            # Build MCP servers
+            - name: Build MCP servers
               working-directory: mcp-servers
-              run: cargo build --release --locked --target ${{ matrix.target }} -p browser-server
+              run: cargo build --release --locked --target ${{ matrix.target }} -p browser-server -p config-server
 
             # Collect binaries into a staging directory
             - name: Stage binaries
@@ -65,6 +65,7 @@ jobs:
                   mkdir -p staging
                   cp zeroclaw/target/${{ matrix.target }}/release/zeroclaw${{ matrix.ext }} staging/
                   cp mcp-servers/target/${{ matrix.target }}/release/browser-server${{ matrix.ext }} staging/
+                  cp mcp-servers/target/${{ matrix.target }}/release/config-server${{ matrix.ext }} staging/
 
             # Package (Unix)
             - name: Package (Unix)
@@ -151,6 +152,5 @@ jobs:
                   generate_release_notes: true
                   files: |
                       artifacts/**/*
-                      artifacts/SHA256SUMS
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
