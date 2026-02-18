@@ -3,4 +3,4 @@
 	url = https://github.com/guyernest/zeroclaw.git
 [submodule "mcp-servers"]
 	path = mcp-servers
-	url = https://github.com/guyernest/mcp-servers.git
+	url = https://github.com/ai-on-cloud/local-agent-mcp-servers.git
