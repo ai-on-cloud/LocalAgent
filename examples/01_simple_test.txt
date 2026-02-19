@@ -1,0 +1,11 @@
+Navigate to https://example.com and verify the browser automation works.
+
+Steps:
+1. Use the navigate tool to go to https://example.com
+2. Use the wait tool to wait for the page to load
+3. Use the screenshot tool to capture the page
+4. Use the get_text tool with selector "h1" to extract the main heading
+5. Use the get_text tool with selector "p" to extract the first paragraph
+6. Use the evaluate_script tool with expression "document.title" to get the page title
+
+Report what you found: the page title, main heading, and paragraph text.

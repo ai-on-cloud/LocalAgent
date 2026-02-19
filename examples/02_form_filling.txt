@@ -1,0 +1,19 @@
+Navigate to https://httpbin.org/forms/post and fill out the pizza order form.
+
+Steps:
+1. Navigate to https://httpbin.org/forms/post
+2. Wait for the page to load
+3. Fill the customer name field (selector: input[name='custname']) with "John Doe"
+4. Fill the telephone field (selector: input[name='custtel']) with "555-0123"
+5. Fill the email field (selector: input[name='custemail']) with "john.doe@example.com"
+6. Click the medium pizza size radio button (selector: input[name='size'][value='medium'])
+7. Click the bacon topping checkbox (selector: input[name='topping'][value='bacon'])
+8. Fill the delivery time field (selector: input[name='delivery']) with "19:00"
+9. Fill the comments textarea (selector: textarea[name='comments']) with "Please ring doorbell twice and leave at door"
+10. Take a screenshot of the filled form
+11. Extract the field values using evaluate_script to verify they were filled correctly:
+    - document.querySelector('input[name="custname"]').value
+    - document.querySelector('input[name="custemail"]').value
+    - document.querySelector('textarea[name="comments"]').value
+
+Report the extracted values to confirm the form was filled correctly.

@@ -75,6 +75,31 @@
                         KeyPath='yes' />
                 </Component>
 
+                <!-- Test examples -->
+                <Directory Id='EXAMPLESDIR' Name='examples'>
+                    <Component Id='ExampleSimpleTest' Guid='*'>
+                        <File
+                            Id='example_01'
+                            Name='01_simple_test.txt'
+                            Source='$(var.BinDir)\examples\01_simple_test.txt'
+                            KeyPath='yes' />
+                    </Component>
+                    <Component Id='ExampleFormFilling' Guid='*'>
+                        <File
+                            Id='example_02'
+                            Name='02_form_filling.txt'
+                            Source='$(var.BinDir)\examples\02_form_filling.txt'
+                            KeyPath='yes' />
+                    </Component>
+                    <Component Id='ExampleRunner' Guid='*'>
+                        <File
+                            Id='run_test_bat'
+                            Name='run-test.bat'
+                            Source='$(var.BinDir)\examples\run-test.bat'
+                            KeyPath='yes' />
+                    </Component>
+                </Directory>
+
             </Directory>
         </StandardDirectory>
 
@@ -165,6 +190,17 @@
                 AllowAbsent='yes'>
                 <ComponentRef Id='LauncherScript' />
                 <ComponentRef Id='WriteConfigScript' />
+            </Feature>
+
+            <Feature
+                Id='ExamplesFeature'
+                Title='Test Examples'
+                Description='Example test scripts for verifying browser automation.'
+                Level='1'
+                AllowAbsent='yes'>
+                <ComponentRef Id='ExampleSimpleTest' />
+                <ComponentRef Id='ExampleFormFilling' />
+                <ComponentRef Id='ExampleRunner' />
             </Feature>
 
             <Feature

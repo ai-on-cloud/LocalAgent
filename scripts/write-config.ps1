@@ -104,13 +104,13 @@ poll_interval_ms = 1000
 [[mcp_servers]]
 name = "config-server"
 transport = "http"
-url = "http://localhost:3100/mcp"
+url = "http://localhost:3100"
 enabled = true
 
 [[mcp_servers]]
 name = "browser-server"
 transport = "http"
-url = "http://localhost:3200/mcp"
+url = "http://localhost:3200"
 enabled = true
 "@
 

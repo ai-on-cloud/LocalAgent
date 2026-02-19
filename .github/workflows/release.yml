@@ -70,13 +70,15 @@ jobs:
                   cp mcp-servers/target/${{ matrix.target }}/release/browser-server${{ matrix.ext }} staging/
                   cp mcp-servers/target/${{ matrix.target }}/release/config-server${{ matrix.ext }} staging/
 
-            # Stage launcher and config scripts (Windows only)
-            - name: Stage scripts
+            # Stage launcher, config scripts, and examples (Windows only)
+            - name: Stage scripts and examples
               if: runner.os == 'Windows'
               shell: bash
               run: |
                   cp scripts/write-config.ps1 staging/
                   cp scripts/start-localagent.bat staging/
+                  mkdir -p staging/examples
+                  cp examples/*.txt examples/*.bat examples/README.md staging/examples/
 
             # Package (Unix)
             - name: Package (Unix)
