@@ -15,11 +15,11 @@ echo.
 
 REM Start config-server in background (log to file for diagnostics)
 echo  [1/3] config-server (port 3100)
-start /B "" "%INSTALL_DIR%config-server.exe" --port 3100 > "%LOG_DIR%\config-server.log" 2>&1
+start /B "" "%INSTALL_DIR%config-server.exe" serve --port 3100 > "%LOG_DIR%\config-server.log" 2>&1
 
 REM Start browser-server in background
 echo  [2/3] browser-server (port 3200)
-start /B "" "%INSTALL_DIR%browser-server.exe" --port 3200 > "%LOG_DIR%\browser-server.log" 2>&1
+start /B "" "%INSTALL_DIR%browser-server.exe" serve --port 3200 > "%LOG_DIR%\browser-server.log" 2>&1
 
 REM Wait for MCP servers to bind to their ports
 echo  Waiting for MCP servers to start...
