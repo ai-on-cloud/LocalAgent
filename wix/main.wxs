@@ -26,6 +26,7 @@
         <Property Id='API_KEY' Secure='yes' />
         <Property Id='PROVIDER' Value='openrouter' />
         <Property Id='ACTIVITY_ARN' Secure='yes' />
+        <Property Id='AWS_PROFILE' Value='browser-agent' />
 
         <StandardDirectory Id='ProgramFiles64Folder'>
             <Directory Id='APPLICATIONFOLDER' Name='LocalAgent'>
@@ -124,7 +125,7 @@
         <CustomAction
             Id='WriteConfig'
             FileRef='zeroclaw_exe'
-            ExeCommand='onboard --api-key "[API_KEY]" --provider "[PROVIDER]" --activity-arn "[ACTIVITY_ARN]"'
+            ExeCommand='onboard --api-key "[API_KEY]" --provider "[PROVIDER]" --activity-arn "[ACTIVITY_ARN]" --aws-profile "[AWS_PROFILE]"'
             Return='ignore' />
 
         <InstallExecuteSequence>
@@ -231,6 +232,9 @@
 
                 <Control Id='ActivityArnLabel' Type='Text' X='20' Y='150' Width='280' Height='13' NoPrefix='yes' Text='Activity ARN (optional, for AWS Step Functions):' />
                 <Control Id='ActivityArnEdit' Type='Edit' X='20' Y='165' Width='330' Height='18' Property='ACTIVITY_ARN' />
+
+                <Control Id='AwsProfileLabel' Type='Text' X='20' Y='195' Width='280' Height='13' NoPrefix='yes' Text='AWS Profile (default: browser-agent):' />
+                <Control Id='AwsProfileEdit' Type='Edit' X='20' Y='210' Width='330' Height='18' Property='AWS_PROFILE' />
 
                 <Control Id='BottomLine' Type='Line' X='0' Y='234' Width='370' Height='0' />
                 <Control Id='Back' Type='PushButton' X='180' Y='243' Width='56' Height='17' Text='&amp;Back'>
