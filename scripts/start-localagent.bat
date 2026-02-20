@@ -26,6 +26,12 @@ if %ERRORLEVEL% equ 0 (
     taskkill /F /IM config-server.exe > nul 2>&1
     timeout /t 1 /nobreak > nul
 )
+tasklist /FI "IMAGENAME eq msedge.exe" 2>nul | find /I "msedge.exe" > nul
+if %ERRORLEVEL% equ 0 (
+    echo  Cleaning up orphaned Edge processes...
+    taskkill /F /IM msedge.exe > nul 2>&1
+    timeout /t 1 /nobreak > nul
+)
 
 REM Also kill anything holding our ports (safety net)
 for /F "tokens=5" %%p in ('netstat -aon ^| findstr ":3200 " ^| findstr "LISTENING" 2^>nul') do (
