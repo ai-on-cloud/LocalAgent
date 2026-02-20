@@ -13,6 +13,30 @@ if not exist "%LOG_DIR%" mkdir "%LOG_DIR%"
 echo Starting LocalAgent...
 echo.
 
+REM Kill any leftover processes from a previous run (e.g. Ctrl+C didn't clean up)
+tasklist /FI "IMAGENAME eq browser-server.exe" 2>nul | find /I "browser-server.exe" > nul
+if %ERRORLEVEL% equ 0 (
+    echo  Cleaning up stale browser-server...
+    taskkill /F /IM browser-server.exe > nul 2>&1
+    timeout /t 2 /nobreak > nul
+)
+tasklist /FI "IMAGENAME eq config-server.exe" 2>nul | find /I "config-server.exe" > nul
+if %ERRORLEVEL% equ 0 (
+    echo  Cleaning up stale config-server...
+    taskkill /F /IM config-server.exe > nul 2>&1
+    timeout /t 1 /nobreak > nul
+)
+
+REM Also kill anything holding our ports (safety net)
+for /F "tokens=5" %%p in ('netstat -aon ^| findstr ":3200 " ^| findstr "LISTENING" 2^>nul') do (
+    echo  Killing PID %%p on port 3200...
+    taskkill /F /PID %%p > nul 2>&1
+)
+for /F "tokens=5" %%p in ('netstat -aon ^| findstr ":3100 " ^| findstr "LISTENING" 2^>nul') do (
+    echo  Killing PID %%p on port 3100...
+    taskkill /F /PID %%p > nul 2>&1
+)
+
 REM Start config-server in background (log to file for diagnostics)
 echo  [1/3] config-server (port 3100)
 start /B "" "%INSTALL_DIR%config-server.exe" serve --port 3100 > "%LOG_DIR%\config-server.log" 2>&1
