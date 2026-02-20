@@ -43,11 +43,8 @@ start /B "" "%INSTALL_DIR%config-server.exe" serve --port 3100 > "%LOG_DIR%\conf
 
 REM Start browser-server in background (auto-detect Edge on Windows)
 set "EDGE_PATH=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-if exist "%EDGE_PATH%" (
-    set "BROWSER_ARG=--browser-path "%EDGE_PATH%""
-) else (
-    set "BROWSER_ARG="
-)
+set "BROWSER_ARG="
+if exist "%EDGE_PATH%" set BROWSER_ARG=--browser-path "%EDGE_PATH%"
 set "PROFILE_ARG="
 if defined BROWSER_PROFILE (
     set "PROFILE_ARG=--profile %BROWSER_PROFILE%"
