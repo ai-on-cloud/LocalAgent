@@ -24,8 +24,12 @@ if exist "%EDGE_PATH%" (
 ) else (
     set "BROWSER_ARG="
 )
+set "PROFILE_ARG="
+if defined BROWSER_PROFILE (
+    set "PROFILE_ARG=--profile %BROWSER_PROFILE%"
+)
 echo  [2/3] browser-server (port 3200)
-start /B "" "%INSTALL_DIR%browser-server.exe" serve --port 3200 %BROWSER_ARG% > "%LOG_DIR%\browser-server.log" 2>&1
+start /B "" "%INSTALL_DIR%browser-server.exe" serve --port 3200 %BROWSER_ARG% %PROFILE_ARG% > "%LOG_DIR%\browser-server.log" 2>&1
 
 REM Wait for MCP servers to bind to their ports
 echo  Waiting for MCP servers to start...
