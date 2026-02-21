@@ -24,6 +24,20 @@ fmt:
     cd zeroclaw && cargo fmt
     cd mcp-servers && cargo fmt
 
+# ── Browser integration tests ────────────────────────────────────
+
+browser-test:
+    cd mcp-servers && just integration-test
+
+browser-test-chrome:
+    cd mcp-servers && just integration-test-chrome
+
+browser-test-edge:
+    cd mcp-servers && just integration-test-edge
+
+browser-check *args:
+    cd mcp-servers && just browser-check {{args}}
+
 # ── Install ──────────────────────────────────────────────────────
 
 install:
