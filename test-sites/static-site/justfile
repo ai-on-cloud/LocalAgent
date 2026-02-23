@@ -1,3 +1,7 @@
+app_id := "d2e7krbov63efe"
+branch := "staging"
+profile := "CGI-PoC"
+
 dev:
     npm run dev
 
@@ -6,6 +10,38 @@ build:
 
 preview:
     npm run preview
+
+# Build and deploy to Amplify Hosting (no GitHub connection)
+deploy: build
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd dist && zip -r /tmp/localagent-deploy.zip . && cd ..
+    output=$(aws amplify create-deployment --profile {{profile}} \
+        --app-id {{app_id}} --branch-name {{branch}} --output json)
+    job_id=$(echo "$output" | jq -r '.jobId')
+    upload_url=$(echo "$output" | jq -r '.zipUploadUrl')
+    echo "Uploading zip (job $job_id)..."
+    curl -sS -T /tmp/localagent-deploy.zip "$upload_url"
+    echo "Starting deployment..."
+    aws amplify start-deployment --profile {{profile}} \
+        --app-id {{app_id}} --branch-name {{branch}} --job-id "$job_id" \
+        --query 'jobSummary.status' --output text
+    echo "Waiting for deployment to complete..."
+    while true; do
+        status=$(aws amplify get-job --profile {{profile}} \
+            --app-id {{app_id}} --branch-name {{branch}} --job-id "$job_id" \
+            --query 'job.summary.status' --output text)
+        echo "  Status: $status"
+        if [ "$status" = "SUCCEED" ]; then
+            echo "Deployed: https://{{branch}}.{{app_id}}.amplifyapp.com/"
+            break
+        elif [ "$status" = "FAILED" ] || [ "$status" = "CANCELLED" ]; then
+            echo "Deployment failed: $status"
+            exit 1
+        fi
+        sleep 5
+    done
+    rm /tmp/localagent-deploy.zip
 
 sandbox:
     npx ampx sandbox
