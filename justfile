@@ -38,6 +38,14 @@ browser-test-edge:
 browser-check *args:
     cd mcp-servers && just browser-check {{args}}
 
+# ── Amplify integration tests ──────────────────────────────────
+
+amplify-test:
+    cd mcp-servers && just amplify-test
+
+amplify-test-edge:
+    cd mcp-servers && just amplify-test-edge
+
 # ── Install ──────────────────────────────────────────────────────
 
 install:
